@@ -1,0 +1,6 @@
+c:\users\amro\documents\visual studio 2015\Projects\consolegame\consolegame\bin\Debug\consolegame.exe.config
+C:\Users\Amro\Documents\Visual Studio 2015\Projects\consolegame\consolegame\bin\Debug\consolegame.exe
+C:\Users\Amro\Documents\Visual Studio 2015\Projects\consolegame\consolegame\bin\Debug\consolegame.pdb
+C:\Users\Amro\Documents\Visual Studio 2015\Projects\consolegame\consolegame\obj\Debug\consolegame.exe
+C:\Users\Amro\Documents\Visual Studio 2015\Projects\consolegame\consolegame\obj\Debug\consolegame.pdb
+C:\Users\Amro\Documents\Visual Studio 2015\Projects\consolegame\consolegame\obj\Debug\consolegame.csprojResolveAssemblyReference.cache

@@ -11,9 +11,53 @@ namespace consolegame
     class Program
     {
 
-        static int x = 1, y = 1;
+        static int x = 1, y = 1 ,levelnum=0;
         static char player = '*';
-        static char [][] screen =new char[13][];
+        static bool haveKay = false;
+        static List<string> levelbody = new List<string>();
+        static List<string> gameLevels =new List<string>();
+
+
+        static void background()
+        {
+            Console.BackgroundColor = ConsoleColor.DarkYellow;
+            Console.Clear();
+
+            gameLevels.Add("level1.txt");
+            gameLevels.Add("level2.txt");
+
+            x = y = 1; //position of cursor.
+
+            //read the levels file.
+            StreamReader level = new StreamReader(gameLevels[levelnum]);
+            string levelContent = level.ReadToEnd();
+            levelbody = levelContent.Split('\n').ToList<string>();
+            //coloring the game.
+            foreach (var character in levelContent)
+            {
+                coloring(character);
+                Console.Write(character);
+            }
+
+            Console.ForegroundColor = ConsoleColor.White;
+
+
+        }
+        static void defaultSitting()
+        {
+            Console.SetCursorPosition(x, y);
+            Console.Write(player);
+            Console.SetCursorPosition(x, y);
+        }
+        static void coloring(char character)
+        {
+            //give the element its color.
+            if (character == '.') Console.ForegroundColor = ConsoleColor.Black;
+            else if (character == '#') Console.ForegroundColor = ConsoleColor.DarkRed;
+            else if (character == '$') Console.ForegroundColor = ConsoleColor.DarkBlue;
+            else if (character == 'K') Console.ForegroundColor = ConsoleColor.DarkGreen;
+
+        }
 
         static void moveplayer(string type)
         {
@@ -34,190 +78,99 @@ namespace consolegame
                 Console.SetCursorPosition(--x, y);
                 Console.Write(player);
                 Console.SetCursorPosition(x, y);
-
             }
             else
             {
                 Console.SetCursorPosition(++x, y);
                 Console.Write(player);
                 Console.SetCursorPosition(x, y);
-
             }
-
         }
-
-        static void makeEnemy(int start , int end ,int ye , int lenght)
+        static void checkMove(int x , int y ,string type)
         {
-            Random rand = new Random();
-            int startMove = rand.Next(start + lenght,end-lenght);
-            int xe = startMove;
-            int count =1;
-            char currDirection = '>';
-
-            while (true)
+            if (levelbody[y][x] != '.' && levelbody[y][x] != 'D' && levelbody[y][x] != '#' && levelbody[y][x] != '$')
             {
-                if (count == lenght || count == 0)
-                {
-                    currDirection = currDirection == '<' ? '>' : '<';
-                }
+                 if (levelbody[y][x] == 'K')
+                                    haveKay = true;
+                
+                 moveplayer(type);
+            }else if (levelbody[y][x] == 'D' && haveKay == true)
+            {
+                haveKay = false;
+                moveplayer(type);
+            }
+            else if(levelbody[y][x] == '#')
+                gameover();
+            else if (levelbody[y][x] == '$')
+                levelComplete();
+            else
+                defaultSitting();
+        }
 
-                if (currDirection == '<')
-                {
-                    Console.SetCursorPosition(0, 0);
-                    for (int i = 0; i < 13; i++) Console.Write(new string(screen[i]));
-                    Thread.Sleep(200);
-                    Console.SetCursorPosition(xe, ye);
-                    Console.Write(' ');
-                    Console.SetCursorPosition(xe, ye);
-                    Console.Write('<');
-                    Console.SetCursorPosition(xe, ye);
-                    xe--;
-                    count--;
-                    
+        static void levelComplete()
+        {
 
-                }
-                else
-                {
-                    Console.SetCursorPosition(0, 0);
-                    for (int i = 0; i < 13; i++) Console.Write(new string(screen[i]));
-                    Thread.Sleep(200);
-                    Console.SetCursorPosition(xe, ye);
-                    Console.Write(' ');
-                    Console.SetCursorPosition(xe, ye);
-                    Console.Write('>');
-                    Console.SetCursorPosition(xe, ye);
-                    xe++;
-                    count++;
-                    
-
-                }
+            Console.Clear();
+            StreamReader levelcompletebg = new StreamReader("levelcomplete.txt");
+            Console.Write(levelcompletebg.ReadToEnd().Replace("@", levelnum+1.ToString()));
+            ConsoleKeyInfo ky = Console.ReadKey();
+            if (ky.Key == ConsoleKey.Enter)
+            {
+                levelnum++;
+                background();
+                defaultSitting();
+                
             }
 
         }
-
-
+        static void gameover()
+        {
+            haveKay = false;
+            Console.Clear();
+            StreamReader gameoverbg = new StreamReader("gameover.txt");
+            string gameover = gameoverbg.ReadToEnd();
+            Console.SetCursorPosition(0, 0);
+            Console.Write(gameover);
+            ConsoleKeyInfo ky;
+            
+                ky =Console.ReadKey();
+                if (ky.Key == ConsoleKey.Enter)
+                {
+                    background();
+                    defaultSitting();
+                    return;
+                }
+                
+        }
 
 
         static void Main(string[] args)
-        {
-
-
-            StreamReader level = new StreamReader("level1.txt");
-            List<string> levelbody = new List<string>();
-            for(int i = 0; i < 13; i++)
-            {
-                string levelline = level.ReadLine();
-                levelbody.Add(levelline);
-                screen [i] = (levelline + "\n").ToCharArray();
-                Console.WriteLine(levelline);
-
-            }
-            
-
-            Console.SetCursorPosition(x, y);
-            Console.Write('*');
-            Console.SetCursorPosition(x, y);
-
-            
-
-            Thread enemy2 = new Thread(() => makeEnemy(15, 28, 2, 3));
-            //enemy2.Start();
-
-
-
-
-
-            bool haveKay =false;
-
-
-
-
-
+        {            
+            background();
+            defaultSitting();
             ConsoleKeyInfo ky;
             while (true)
             {
-                
-
                 ky = Console.ReadKey();
                 switch (ky.Key)
                 {
                     case ConsoleKey.DownArrow:
-                        if (levelbody[y + 1][x] != '.' && levelbody[y + 1][x] != 'D')
-                        {
-                            
-                            if (levelbody[y + 1][x] == 'K') haveKay = true;
-                            moveplayer("down");
-                        }
-                        else if (levelbody[y+1][x] == 'D' && haveKay == true)
-                        {
-                            
-                            moveplayer("down");
-                            haveKay = false;
-                        }
-                        else
-                        {
-                            Console.SetCursorPosition(x, y);
-                            Console.Write("*");
-                            Console.SetCursorPosition(x, y);
-                        }
+                        checkMove(x, y + 1, "down");
                         break;
                     case ConsoleKey.UpArrow:
-                        if (levelbody[y - 1][x] != '.')
-                        {
-                            
-                            if (levelbody[y - 1][x] == 'K') haveKay = true;
-                            moveplayer("up");
-                        }
-                        else
-                        {
-                            Console.SetCursorPosition(x, y);
-                            Console.Write("*");
-                            Console.SetCursorPosition(x, y);
-                        }
+                        checkMove(x, y - 1, "up");
                         break;
                     case ConsoleKey.LeftArrow:
-                        if (levelbody[y][x-1] != '.')
-                        {
-                            
-                            if (levelbody[y][x-1] == 'K') haveKay = true;
-                            moveplayer("left");
-                        }
-                        else
-                        {
-                            Console.SetCursorPosition(x, y);
-                            Console.Write("*");
-                            Console.SetCursorPosition(x, y);
-                        }
+                        checkMove(x-1, y, "left");
                         break;
                     case ConsoleKey.RightArrow:
-                        if (levelbody[y][x+1] != '.')
-                        {
-                            if (levelbody[y][x+1] == 'K') haveKay = true;
-                            moveplayer("right");
-                        }
-                        else
-                        {
-                            Console.SetCursorPosition(x, y);
-                            Console.Write("*");
-                            Console.SetCursorPosition(x, y);
-
-                        }
+                        checkMove(x + 1, y, "right");
                         break;
                     default:
-                        Console.SetCursorPosition(x, y);
-
+                        defaultSitting();
                         break;
-
-                }
-
-                Thread enemy1 = new Thread(() => makeEnemy(15, 28, 1, 3));
-                enemy1.Start();
+                }               
             }
-
-
-            
-         
-
 
                 Console.ReadKey();
 
